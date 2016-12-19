@@ -28,9 +28,6 @@
 // Declares llvm::cl::extrahelp.
 #include "llvm/Support/CommandLine.h"
 
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-
 #include "LoopMatcher.hpp"
 
 using namespace clang::tooling;
@@ -44,13 +41,12 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 
 int main(int argc, const char **argv)
 {
-  CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
-  ClangTool Tool(OptionsParser.getCompilations(),
-                 OptionsParser.getSourcePathList());
+  CommonOptionsParser OptionsParser { argc, argv, MyToolCategory };
+  ClangTool tool { OptionsParser.getCompilations(), OptionsParser.getSourcePathList() };
 
-  LoopPrinter Printer;
-  MatchFinder Finder;
-  Finder.addMatcher(LoopMatcher, &Printer);
+  LoopPrinter printer;
+  clang::ast_matchers::MatchFinder finder;
+  finder.addMatcher(LoopMatcher, &printer);
 
-  return Tool.run(newFrontendActionFactory(&Finder).get());
+  return tool.run(newFrontendActionFactory(&finder).get());
 }

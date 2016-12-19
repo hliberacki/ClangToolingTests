@@ -1,18 +1,11 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 
-using namespace clang::tooling;
-using namespace clang::ast_matchers;
-using namespace llvm;
+extern clang::ast_matchers::StatementMatcher LoopMatcher;
 
-StatementMatcher LoopMatcher =
-  forStmt(hasLoopInit(declStmt(hasSingleDecl(varDecl(
-    hasInitializer(integerLiteral(equals(0)))))))).bind("forLoop");
-
-class LoopPrinter : public MatchFinder::MatchCallback {
+class LoopPrinter : public clang::ast_matchers::MatchFinder::MatchCallback
+{
 public :
-  virtual void run(const MatchFinder::MatchResult &Result) {
-    if (const clang::ForStmt *FS = Result.Nodes.getNodeAs<clang::ForStmt>("forLoop"))
-      FS->dump();
-  }
+	virtual void run(const clang::ast_matchers::MatchFinder::MatchResult &result);
+
 };
